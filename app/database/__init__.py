@@ -60,6 +60,10 @@ def findOne(id):
 
 def update(id, first_name, last_name, hobbies):
   user = findOne(id)
+
+  if user is None:
+    return None
+
   first_name = first_name or user[FIRST_NAME]
   last_name = last_name or user[LAST_NAME]
   hobbies = hobbies or user[HOBBIES]
@@ -78,4 +82,20 @@ def update(id, first_name, last_name, hobbies):
   cursor.execute(query, parameters)
   cursor.commit()
   return findOne(id)
+   
+def delete(id):
+  user = findOne(id)
+  if not user:
+    return "User not found"
+
+  query = """ 
+      DELETE FROM user
+      WHERE id = ?
+    """
+  cursor = get_db()
+  cursor.execute(query, str(id))
+  cursor.commit()
+  if findOne(id) is None:
+    return f"Success! Deleted user {id}"
+  return f"Fails! unable to delete user {id}"
    

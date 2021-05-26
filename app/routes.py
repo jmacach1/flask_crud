@@ -2,7 +2,7 @@
 
 from flask import request
 from app import app
-from app.database import (scan, findOne, create, update)
+from app.database import (scan, findOne, create, update, delete)
 
 @app.route("/users")
 def get_all_users():
@@ -38,19 +38,34 @@ def create_user(): # view fn
   }
 
 
-@app.route("/user/update", methods=["POST"])
+@app.route("/user/update", methods=["PUT"])
 def update_user():
   user_data = request.json
+  id = user_data.get("id")
   user = update(
-    user_data.get("id"),
+    id,
     user_data.get("first_name"),
     user_data.get("last_name"),
     user_data.get("hobbies")
   )
+  if user:
+    return {
+      "ok" : True,
+      "message": "Success",
+      "new_id" : user
+    }
   return {
-    "ok" : True,
-    "message": "Success",
-    "new_id" : user
+    "ok": False,
+    "message": f"Unable to Update user {id} not Found"
+  }
+
+
+
+@app.route("/user/delete/<int:id>", methods=["DELETE"])
+def delete_user(id):
+  message = delete(id)
+  return {
+    "message": message
   }
 
 
